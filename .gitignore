@@ -1,0 +1,41 @@
+# Virtual environment
+venv/
+env/
+.venv/
+
+# Piper voice models (too large for GitHub, users download via app)
+models/piper/*.onnx
+models/piper/*.json
+
+# Generated audio files
+*.mp3
+*.wav
+output/
+test_output/
+
+# User settings
+tts_config.json
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
