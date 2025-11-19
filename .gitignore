@@ -39,3 +39,12 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Local files not to sync
+do not sync/
+
+# Claude settings
+.claude/
+
+# Windows special files
+nul
