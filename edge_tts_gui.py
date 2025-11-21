@@ -86,6 +86,74 @@ class EdgeTTSApp(ctk.CTk):
         self.speed_var = ctk.DoubleVar(value=1.0)
         self.pitch_var = ctk.DoubleVar(value=0)
         self.volume_var = ctk.DoubleVar(value=0)
+        self.show_all_languages_var = ctk.BooleanVar(value=False)
+        self.selected_language = ctk.StringVar(value="English (US)")  # User selected language
+
+        # Piper supported languages (~40 from HuggingFace)
+        self.piper_languages = [
+            "Arabic", "Catalan", "Chinese", "Czech", "Danish", "Dutch", "English (GB)",
+            "English (US)", "Finnish", "French", "German", "Greek", "Hungarian",
+            "Icelandic", "Italian", "Japanese", "Kazakh", "Korean", "Nepali",
+            "Norwegian", "Polish", "Portuguese (BR)", "Portuguese (PT)", "Romanian",
+            "Russian", "Serbian", "Slovak", "Slovenian", "Spanish", "Swedish",
+            "Swahili", "Turkish", "Ukrainian", "Vietnamese", "Welsh"
+        ]
+
+        # Edge TTS supported languages (100+)
+        self.edge_languages = [
+            "Afrikaans", "Albanian", "Amharic", "Arabic", "Armenian", "Azerbaijani",
+            "Bangla", "Basque", "Bosnian", "Bulgarian", "Burmese", "Catalan",
+            "Chinese (Cantonese)", "Chinese (Mandarin)", "Chinese (Taiwanese)",
+            "Croatian", "Czech", "Danish", "Dutch", "English (AU)", "English (CA)",
+            "English (GB)", "English (HK)", "English (IE)", "English (IN)",
+            "English (KE)", "English (NZ)", "English (PH)", "English (SG)",
+            "English (US)", "English (ZA)", "Estonian", "Filipino", "Finnish",
+            "French", "French (BE)", "French (CA)", "French (CH)", "Galician",
+            "Georgian", "German", "German (AT)", "German (CH)", "Greek", "Gujarati",
+            "Hebrew", "Hindi", "Hungarian", "Icelandic", "Indonesian", "Irish",
+            "Italian", "Japanese", "Javanese", "Kannada", "Kazakh", "Khmer",
+            "Korean", "Lao", "Latvian", "Lithuanian", "Macedonian", "Malay",
+            "Malayalam", "Maltese", "Marathi", "Mongolian", "Nepali", "Norwegian",
+            "Pashto", "Persian", "Polish", "Portuguese (BR)", "Portuguese (PT)",
+            "Punjabi", "Romanian", "Russian", "Serbian", "Sinhala", "Slovak",
+            "Slovenian", "Somali", "Spanish", "Spanish (AR)", "Spanish (CO)",
+            "Spanish (MX)", "Spanish (US)", "Sundanese", "Swahili", "Swedish",
+            "Tamil", "Telugu", "Thai", "Turkish", "Ukrainian", "Urdu", "Uzbek",
+            "Vietnamese", "Welsh", "Zulu"
+        ]
+
+        # Language code mapping for filtering voices
+        self.language_to_code = {
+            "English (US)": "en", "English (GB)": "en", "English (AU)": "en",
+            "English (CA)": "en", "English (IN)": "en", "English (IE)": "en",
+            "English (NZ)": "en", "English (ZA)": "en", "English (HK)": "en",
+            "English (KE)": "en", "English (PH)": "en", "English (SG)": "en",
+            "Spanish": "es", "Spanish (AR)": "es", "Spanish (CO)": "es",
+            "Spanish (MX)": "es", "Spanish (US)": "es",
+            "French": "fr", "French (BE)": "fr", "French (CA)": "fr", "French (CH)": "fr",
+            "German": "de", "German (AT)": "de", "German (CH)": "de",
+            "Italian": "it", "Portuguese (BR)": "pt", "Portuguese (PT)": "pt",
+            "Russian": "ru", "Chinese (Mandarin)": "zh", "Chinese (Cantonese)": "zh",
+            "Chinese (Taiwanese)": "zh", "Chinese": "zh", "Japanese": "ja",
+            "Korean": "ko", "Arabic": "ar", "Hindi": "hi", "Dutch": "nl",
+            "Polish": "pl", "Turkish": "tr", "Vietnamese": "vi", "Thai": "th",
+            "Greek": "el", "Czech": "cs", "Romanian": "ro", "Hungarian": "hu",
+            "Danish": "da", "Finnish": "fi", "Norwegian": "nb", "Swedish": "sv",
+            "Ukrainian": "uk", "Hebrew": "he", "Indonesian": "id", "Malay": "ms",
+            "Filipino": "fil", "Slovak": "sk", "Slovenian": "sl", "Croatian": "hr",
+            "Bulgarian": "bg", "Serbian": "sr", "Catalan": "ca", "Galician": "gl",
+            "Basque": "eu", "Welsh": "cy", "Irish": "ga", "Icelandic": "is",
+            "Latvian": "lv", "Lithuanian": "lt", "Estonian": "et", "Maltese": "mt",
+            "Albanian": "sq", "Macedonian": "mk", "Bosnian": "bs", "Georgian": "ka",
+            "Armenian": "hy", "Azerbaijani": "az", "Kazakh": "kk", "Uzbek": "uz",
+            "Mongolian": "mn", "Nepali": "ne", "Bengali": "bn", "Bangla": "bn",
+            "Tamil": "ta", "Telugu": "te", "Kannada": "kn", "Malayalam": "ml",
+            "Marathi": "mr", "Gujarati": "gu", "Punjabi": "pa", "Urdu": "ur",
+            "Persian": "fa", "Pashto": "ps", "Sinhala": "si", "Burmese": "my",
+            "Khmer": "km", "Lao": "lo", "Javanese": "jv", "Sundanese": "su",
+            "Swahili": "sw", "Amharic": "am", "Somali": "so", "Zulu": "zu",
+            "Afrikaans": "af"
+        }
 
         # Generate default output filename with timestamp
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -264,6 +332,41 @@ class EdgeTTSApp(ctk.CTk):
             font=ctk.CTkFont(size=12, weight="bold")
         ).pack(anchor="w", padx=10, pady=(8, 2))
 
+        # Language selection with searchable dropdown
+        lang_frame = ctk.CTkFrame(settings_frame, fg_color="transparent")
+        lang_frame.pack(fill="x", padx=10, pady=3)
+
+        ctk.CTkLabel(lang_frame, text="Language:", width=80).pack(side="left", padx=5)
+
+        # Language button that opens searchable dropdown
+        self.language_btn = ctk.CTkButton(
+            lang_frame,
+            textvariable=self.selected_language,
+            width=200,
+            height=28,
+            fg_color=["#E5E5E5", "#2B2B2B"],
+            hover_color=["#D5D5D5", "#3A3A3A"],
+            border_width=2,
+            border_color=["#CCCCCC", "#404040"],
+            text_color=["#000000", "#FFFFFF"],
+            anchor="w",
+            command=self.show_language_selector
+        )
+        self.language_btn.pack(side="left", padx=5)
+
+        # Store current language list reference
+        self.current_language_list = self.edge_languages
+
+        # Show all languages checkbox
+        self.show_all_lang_checkbox = ctk.CTkCheckBox(
+            lang_frame,
+            text="Show all voices",
+            variable=self.show_all_languages_var,
+            command=self.on_language_filter_change,
+            font=ctk.CTkFont(size=11)
+        )
+        self.show_all_lang_checkbox.pack(side="left", padx=15)
+
         # Voice selection
         voice_frame = ctk.CTkFrame(settings_frame, fg_color="transparent")
         voice_frame.pack(fill="x", padx=10, pady=3)
@@ -274,7 +377,7 @@ class EdgeTTSApp(ctk.CTk):
             variable=self.voice_display_var,
             values=list(self.voice_display.keys()),
             command=self.on_voice_display_change,
-            width=220
+            width=300
         )
         self.voice_menu.pack(side="left", padx=5)
 
@@ -502,6 +605,10 @@ class EdgeTTSApp(ctk.CTk):
             self.speed_slider.configure(state="normal")
             self.pitch_slider.configure(state="normal")
             self.volume_slider.configure(state="normal")
+            # Update language list to Edge languages
+            self.current_language_list = self.edge_languages
+            if self.selected_language.get() not in self.edge_languages:
+                self.selected_language.set("English (US)")
         else:
             self.engine_status_label.configure(
                 text="💻 Offline - Piper Local Neural Voices"
@@ -518,31 +625,13 @@ class EdgeTTSApp(ctk.CTk):
             self.speed_label.configure(text="1.00x")
             self.pitch_label.configure(text="+0Hz")
             self.volume_label.configure(text="+0%")
+            # Update language list to Piper languages
+            self.current_language_list = self.piper_languages
+            if self.selected_language.get() not in self.piper_languages:
+                self.selected_language.set("English (US)")
 
-        # Update voices for new engine
-        self.voice_categories = self.current_engine.get_voices()
-        self.all_voices = {}
-        for category, voices in self.voice_categories.items():
-            self.all_voices.update(voices)
-
-        # Rebuild display name mappings
-        self.voice_display = {}
-        self.voice_id_to_display = {}
-        for voice_id, desc in self.all_voices.items():
-            display_name = desc.split(' [')[0].split(' (')[0]
-            self.voice_display[display_name] = voice_id
-            self.voice_id_to_display[voice_id] = display_name
-
-        # Update voice dropdown with display names
-        display_names = list(self.voice_display.keys())
-        self.voice_menu.configure(values=display_names)
-
-        # Select first voice
-        if display_names:
-            self.voice_display_var.set(display_names[0])
-            first_voice_id = self.voice_display[display_names[0]]
-            self.voice_var.set(first_voice_id)
-            self.update_voice_status()
+        # Update voice dropdown with filtered voices
+        self.update_voice_dropdown()
 
         # Update output extension
         ext = self.current_engine.get_output_extension()
@@ -569,11 +658,25 @@ class EdgeTTSApp(ctk.CTk):
         y = self.winfo_y() + (self.winfo_height() // 2) - 200
         dialog.geometry(f"+{x}+{y}")
 
+        # Header frame with title and check button
+        header_frame = ctk.CTkFrame(dialog, fg_color="transparent")
+        header_frame.pack(fill="x", padx=10, pady=10)
+
         ctk.CTkLabel(
-            dialog,
+            header_frame,
             text="Available Piper Voices",
             font=ctk.CTkFont(size=16, weight="bold")
-        ).pack(pady=10)
+        ).pack(side="left")
+
+        # Check for new voices button
+        ctk.CTkButton(
+            header_frame,
+            text="🔄 Check for New Voices",
+            width=160,
+            height=28,
+            font=ctk.CTkFont(size=11),
+            command=lambda: self.check_for_new_voices(dialog)
+        ).pack(side="right", padx=5)
 
         # Scrollable frame for voices
         scroll_frame = ctk.CTkScrollableFrame(dialog, height=250)
@@ -1018,6 +1121,632 @@ class EdgeTTSApp(ctk.CTk):
                 self.output_path_var.set(config.get('output_path', str(Path.cwd() / "output.mp3")))
         except Exception as e:
             print(f"Failed to load settings: {e}")
+
+    def show_language_selector(self):
+        """Show searchable language selector dialog"""
+        dialog = ctk.CTkToplevel(self)
+        dialog.title("Select Language")
+        dialog.geometry("300x400")
+        dialog.transient(self)
+        dialog.grab_set()
+
+        # Center dialog near the button
+        dialog.update_idletasks()
+        x = self.winfo_x() + 150
+        y = self.winfo_y() + 200
+        dialog.geometry(f"+{x}+{y}")
+
+        # Search entry
+        search_var = ctk.StringVar()
+        search_entry = ctk.CTkEntry(
+            dialog,
+            placeholder_text="Search language...",
+            textvariable=search_var,
+            width=260
+        )
+        search_entry.pack(padx=15, pady=(15, 10))
+        search_entry.focus_set()
+
+        # Scrollable frame for language list
+        scroll_frame = ctk.CTkScrollableFrame(dialog, height=300)
+        scroll_frame.pack(fill="both", expand=True, padx=15, pady=(0, 15))
+
+        # Store button references for filtering
+        lang_buttons = []
+
+        def select_language(lang):
+            self.selected_language.set(lang)
+            dialog.destroy()
+            self.on_language_change(lang)
+
+        def create_buttons(filter_text=""):
+            # Clear existing buttons
+            for widget in scroll_frame.winfo_children():
+                widget.destroy()
+            lang_buttons.clear()
+
+            filter_lower = filter_text.lower()
+            for lang in self.current_language_list:
+                if filter_lower in lang.lower():
+                    btn = ctk.CTkButton(
+                        scroll_frame,
+                        text=lang,
+                        anchor="w",
+                        height=28,
+                        fg_color="transparent",
+                        text_color=["#000000", "#FFFFFF"],
+                        hover_color=["#ECECEC", "#3E3E3E"],
+                        command=lambda l=lang: select_language(l)
+                    )
+                    btn.pack(fill="x", pady=1)
+                    lang_buttons.append(btn)
+
+        # Initial population
+        create_buttons()
+
+        # Filter on search
+        def on_search(*args):
+            create_buttons(search_var.get())
+
+        search_var.trace_add("write", on_search)
+
+        # Handle Enter key to select first match
+        def on_enter(event):
+            if lang_buttons:
+                # Get first visible button's text
+                first_lang = lang_buttons[0].cget("text")
+                select_language(first_lang)
+
+        search_entry.bind("<Return>", on_enter)
+
+        # Handle Escape to close
+        dialog.bind("<Escape>", lambda e: dialog.destroy())
+
+    def on_language_change(self, selected_lang: str):
+        """Handle language selection change - filter voices by selected language"""
+        self.update_voice_dropdown()
+
+        # For Piper: check if voices are downloaded for this language
+        if isinstance(self.current_engine, PiperTTSEngine):
+            lang_code = self.language_to_code.get(selected_lang, selected_lang[:2].lower())
+            if not self.current_engine.has_downloaded_voices_for_language(lang_code):
+                self.show_language_not_available_dialog(lang_code)
+
+    def on_language_filter_change(self):
+        """Handle 'Show all voices' checkbox change"""
+        self.update_voice_dropdown()
+
+    def update_voice_dropdown(self):
+        """Update voice dropdown based on language selection"""
+        show_all = self.show_all_languages_var.get()
+        selected_lang = self.selected_language.get()
+        lang_code = self.language_to_code.get(selected_lang, selected_lang[:2].lower())
+
+        # Get all voices from current engine
+        all_voice_categories = self.current_engine.get_voices()
+
+        if show_all:
+            # Show all voices without filtering
+            self.voice_categories = all_voice_categories
+        else:
+            # Filter voices by selected language
+            filtered = {}
+            for category, voices in all_voice_categories.items():
+                filtered_voices = {}
+                for voice_id, voice_desc in voices.items():
+                    # Get voice language code
+                    if isinstance(self.current_engine, PiperTTSEngine):
+                        voice_lang = self.current_engine.get_voice_language(voice_id)
+                    else:
+                        # Edge TTS: extract from voice_id (e.g., en-US-JennyNeural -> en)
+                        voice_lang = voice_id.split('-')[0].lower() if '-' in voice_id else None
+
+                    if voice_lang == lang_code:
+                        filtered_voices[voice_id] = voice_desc
+
+                if filtered_voices:
+                    filtered[category] = filtered_voices
+
+            self.voice_categories = filtered if filtered else all_voice_categories
+
+        # Rebuild voice display mappings
+        self.all_voices = {}
+        for category, voices in self.voice_categories.items():
+            self.all_voices.update(voices)
+
+        self.voice_display = {}
+        self.voice_id_to_display = {}
+        for voice_id, desc in self.all_voices.items():
+            # Remove status tags and indentation for display name
+            display_name = desc.strip().split(' [')[0].split(' (')[0]
+            self.voice_display[display_name] = voice_id
+            self.voice_id_to_display[voice_id] = display_name
+
+        # Update dropdown values
+        display_names = list(self.voice_display.keys())
+        if display_names:
+            self.voice_menu.configure(values=display_names)
+
+            # Try to keep current voice if still available
+            current_voice = self.voice_var.get()
+            if current_voice in self.voice_id_to_display:
+                self.voice_display_var.set(self.voice_id_to_display[current_voice])
+            else:
+                # Select first voice
+                self.voice_display_var.set(display_names[0])
+                self.voice_var.set(self.voice_display[display_names[0]])
+
+            self.update_voice_status()
+
+    def check_for_new_voices(self, parent_dialog):
+        """Check for new voices in user's downloaded languages only"""
+        if not isinstance(self.current_engine, PiperTTSEngine):
+            return
+
+        # Get languages that user has already downloaded
+        downloaded_langs = self.current_engine.get_downloaded_languages()
+
+        if not downloaded_langs:
+            messagebox.showinfo(
+                "No Languages Installed",
+                "You haven't downloaded any voices yet.\n\nDownload voices first to check for updates."
+            )
+            return
+
+        # Check for new voices in those languages
+        new_voices = {}
+        lang_names_map = {
+            'en': 'English', 'es': 'Spanish', 'it': 'Italian', 'fr': 'French',
+            'de': 'German', 'pt': 'Portuguese', 'ru': 'Russian', 'zh': 'Chinese',
+            'ja': 'Japanese', 'ko': 'Korean', 'nl': 'Dutch', 'pl': 'Polish',
+            'uk': 'Ukrainian', 'vi': 'Vietnamese', 'ar': 'Arabic', 'tr': 'Turkish',
+            'hi': 'Hindi', 'cs': 'Czech', 'da': 'Danish', 'fi': 'Finnish',
+            'el': 'Greek', 'hu': 'Hungarian', 'is': 'Icelandic', 'nb': 'Norwegian',
+            'ro': 'Romanian', 'sk': 'Slovak', 'sv': 'Swedish', 'sw': 'Swahili',
+            'ka': 'Georgian'
+        }
+
+        # Scan for new voices
+        for category, voices in self.current_engine.PIPER_VOICES.items():
+            for voice_id, info in voices.items():
+                voice_lang = self.current_engine.get_voice_language(voice_id)
+
+                # Only check voices in downloaded languages
+                if voice_lang in downloaded_langs:
+                    # Check if this voice is NOT downloaded
+                    if not self.current_engine.is_voice_downloaded(voice_id):
+                        lang_name = lang_names_map.get(voice_lang, voice_lang.upper())
+                        if lang_name not in new_voices:
+                            new_voices[lang_name] = []
+                        new_voices[lang_name].append(info['name'])
+
+        # Show results
+        if not new_voices:
+            messagebox.showinfo(
+                "No New Voices",
+                "You have all available voices for your installed languages!"
+            )
+            return
+
+        # Create dialog showing new voices
+        result_dialog = ctk.CTkToplevel(self)
+        result_dialog.title("New Voices Available")
+        result_dialog.geometry("400x300")
+        result_dialog.transient(parent_dialog)
+        result_dialog.grab_set()
+
+        # Center dialog
+        result_dialog.update_idletasks()
+        x = self.winfo_x() + (self.winfo_width() // 2) - 200
+        y = self.winfo_y() + (self.winfo_height() // 2) - 150
+        result_dialog.geometry(f"+{x}+{y}")
+
+        # Title
+        total_new = sum(len(v) for v in new_voices.values())
+        ctk.CTkLabel(
+            result_dialog,
+            text=f"{total_new} New Voice{'s' if total_new > 1 else ''} Available!",
+            font=ctk.CTkFont(size=16, weight="bold")
+        ).pack(pady=(15, 10))
+
+        # Scrollable frame for results
+        scroll = ctk.CTkScrollableFrame(result_dialog, height=180)
+        scroll.pack(fill="both", expand=True, padx=15, pady=5)
+
+        # List new voices by language
+        for lang_name in sorted(new_voices.keys()):
+            voices_list = new_voices[lang_name]
+
+            # Language header
+            ctk.CTkLabel(
+                scroll,
+                text=f"{lang_name}:",
+                font=ctk.CTkFont(size=12, weight="bold"),
+                anchor="w"
+            ).pack(anchor="w", pady=(10, 5))
+
+            # Voice list
+            for voice_name in voices_list:
+                ctk.CTkLabel(
+                    scroll,
+                    text=f"  • {voice_name}",
+                    font=ctk.CTkFont(size=11),
+                    anchor="w"
+                ).pack(anchor="w", pady=2)
+
+        # Close button
+        ctk.CTkButton(
+            result_dialog,
+            text="Close",
+            width=100,
+            command=result_dialog.destroy
+        ).pack(pady=15)
+
+    def show_language_not_available_dialog(self, lang_code: str):
+        """Show dialog when a language is detected but no voices are downloaded"""
+        # Language name mapping
+        lang_names = {
+            'en': 'English', 'es': 'Spanish', 'it': 'Italian', 'fr': 'French',
+            'de': 'German', 'pt': 'Portuguese', 'ru': 'Russian', 'zh': 'Chinese',
+            'ja': 'Japanese', 'ko': 'Korean', 'nl': 'Dutch', 'pl': 'Polish',
+            'uk': 'Ukrainian', 'vi': 'Vietnamese', 'ar': 'Arabic', 'tr': 'Turkish',
+            'hi': 'Hindi', 'cs': 'Czech', 'da': 'Danish', 'fi': 'Finnish',
+            'el': 'Greek', 'hu': 'Hungarian', 'is': 'Icelandic', 'nb': 'Norwegian',
+            'ro': 'Romanian', 'sk': 'Slovak', 'sv': 'Swedish', 'sw': 'Swahili',
+            'ka': 'Georgian'
+        }
+
+        lang_name = lang_names.get(lang_code, lang_code.upper())
+
+        # Create dialog
+        dialog = ctk.CTkToplevel(self)
+        dialog.title(f"{lang_name} Language Selected")
+        dialog.geometry("400x200")
+        dialog.transient(self)
+        dialog.grab_set()
+
+        # Center dialog
+        dialog.update_idletasks()
+        x = self.winfo_x() + (self.winfo_width() // 2) - 200
+        y = self.winfo_y() + (self.winfo_height() // 2) - 100
+        dialog.geometry(f"+{x}+{y}")
+
+        # Title
+        ctk.CTkLabel(
+            dialog,
+            text=f"{lang_name} Language Selected",
+            font=ctk.CTkFont(size=16, weight="bold")
+        ).pack(pady=(20, 10))
+
+        # Message
+        ctk.CTkLabel(
+            dialog,
+            text=f"No {lang_name} voices are installed.\n\nWould you like to download {lang_name} voices?",
+            font=ctk.CTkFont(size=12),
+            justify="center"
+        ).pack(pady=10)
+
+        # Buttons frame
+        btn_frame = ctk.CTkFrame(dialog, fg_color="transparent")
+        btn_frame.pack(pady=20)
+
+        def on_download():
+            dialog.destroy()
+            self.download_voices_for_language(lang_code, lang_name)
+
+        def on_dismiss():
+            dialog.destroy()
+
+        ctk.CTkButton(
+            btn_frame,
+            text="Download Voices",
+            width=140,
+            command=on_download
+        ).pack(side="left", padx=10)
+
+        ctk.CTkButton(
+            btn_frame,
+            text="Dismiss",
+            width=100,
+            fg_color="gray",
+            hover_color="#555555",
+            command=on_dismiss
+        ).pack(side="left", padx=10)
+
+    def download_voices_for_language(self, lang_code: str, lang_name: str):
+        """Download voices for a specific language"""
+        if not isinstance(self.current_engine, PiperTTSEngine):
+            return
+
+        # Find voices for this language in predefined list
+        voices_to_download = []
+        for category, voices in self.current_engine.PIPER_VOICES.items():
+            for voice_id, info in voices.items():
+                voice_lang = self.current_engine.get_voice_language(voice_id)
+                if voice_lang == lang_code and not self.current_engine.is_voice_downloaded(voice_id):
+                    voices_to_download.append((voice_id, info))
+
+        if voices_to_download:
+            # Has predefined voices - show download dialog
+            self.show_language_download_dialog(lang_code, lang_name, voices_to_download)
+        else:
+            # No predefined voices - show manual download instructions
+            self.show_manual_download_instructions(lang_code, lang_name)
+
+    def show_language_download_dialog(self, lang_code: str, lang_name: str, voices: list):
+        """Show dialog to download voices for a specific language"""
+        dialog = ctk.CTkToplevel(self)
+        dialog.title(f"Download {lang_name} Voices")
+        dialog.geometry("500x400")
+        dialog.transient(self)
+        dialog.grab_set()
+
+        # Center dialog
+        dialog.update_idletasks()
+        x = self.winfo_x() + (self.winfo_width() // 2) - 250
+        y = self.winfo_y() + (self.winfo_height() // 2) - 200
+        dialog.geometry(f"+{x}+{y}")
+
+        # Title
+        ctk.CTkLabel(
+            dialog,
+            text=f"Download {lang_name} Voices",
+            font=ctk.CTkFont(size=16, weight="bold")
+        ).pack(pady=(15, 10))
+
+        ctk.CTkLabel(
+            dialog,
+            text=f"Found {len(voices)} {lang_name} voice(s) available for download:",
+            font=ctk.CTkFont(size=12)
+        ).pack(pady=(0, 10))
+
+        # Scrollable frame for voices
+        scroll_frame = ctk.CTkScrollableFrame(dialog, height=180)
+        scroll_frame.pack(fill="both", expand=True, padx=15, pady=5)
+
+        # Track download buttons and progress bars
+        download_widgets = {}
+
+        for voice_id, info in voices:
+            voice_frame = ctk.CTkFrame(scroll_frame, fg_color="transparent")
+            voice_frame.pack(fill="x", pady=5)
+
+            # Voice name
+            ctk.CTkLabel(
+                voice_frame,
+                text=info['name'],
+                font=ctk.CTkFont(size=11),
+                anchor="w",
+                width=200
+            ).pack(side="left", padx=5)
+
+            # Progress bar (hidden initially)
+            progress_bar = ctk.CTkProgressBar(voice_frame, width=120, height=12)
+            progress_bar.set(0)
+            progress_bar.pack(side="left", padx=5)
+            progress_bar.pack_forget()  # Hide initially
+
+            # Status label
+            status_label = ctk.CTkLabel(
+                voice_frame,
+                text="",
+                font=ctk.CTkFont(size=9),
+                width=80
+            )
+            status_label.pack(side="left", padx=2)
+            status_label.pack_forget()  # Hide initially
+
+            # Download button
+            btn = ctk.CTkButton(
+                voice_frame,
+                text="Download",
+                width=80,
+                height=24,
+                font=ctk.CTkFont(size=10),
+                command=lambda vid=voice_id: self.download_single_voice_with_progress(vid, download_widgets)
+            )
+            btn.pack(side="right", padx=5)
+
+            download_widgets[voice_id] = {
+                'button': btn,
+                'progress': progress_bar,
+                'status': status_label
+            }
+
+        # Download all button
+        btn_frame = ctk.CTkFrame(dialog, fg_color="transparent")
+        btn_frame.pack(pady=15)
+
+        def download_all():
+            for voice_id, info in voices:
+                if not self.current_engine.is_voice_downloaded(voice_id):
+                    self.download_single_voice_with_progress(voice_id, download_widgets)
+
+        ctk.CTkButton(
+            btn_frame,
+            text=f"Download All ({len(voices)})",
+            width=140,
+            command=download_all
+        ).pack(side="left", padx=10)
+
+        ctk.CTkButton(
+            btn_frame,
+            text="Close",
+            width=100,
+            fg_color="gray",
+            hover_color="#555555",
+            command=dialog.destroy
+        ).pack(side="left", padx=10)
+
+    def download_single_voice_from_dialog(self, voice_id: str, buttons_dict: dict):
+        """Download a single voice and update button state"""
+        if voice_id in buttons_dict:
+            buttons_dict[voice_id].configure(text="...", state="disabled")
+
+        def do_download():
+            try:
+                def progress_callback(progress, status):
+                    pass  # Silent download
+
+                self.current_engine.download_voice(voice_id, progress_callback)
+
+                # Update button on completion
+                if voice_id in buttons_dict:
+                    self.after(0, lambda: buttons_dict[voice_id].configure(
+                        text="Done",
+                        fg_color="green",
+                        state="disabled"
+                    ))
+
+                # Refresh voice dropdown
+                self.after(100, self.update_voice_dropdown)
+
+            except Exception as e:
+                if voice_id in buttons_dict:
+                    self.after(0, lambda: buttons_dict[voice_id].configure(
+                        text="Failed",
+                        fg_color="red",
+                        state="disabled"
+                    ))
+
+        threading.Thread(target=do_download, daemon=True).start()
+
+    def download_single_voice_with_progress(self, voice_id: str, widgets_dict: dict):
+        """Download a single voice with progress bar updates"""
+        if voice_id not in widgets_dict:
+            return
+
+        widgets = widgets_dict[voice_id]
+        btn = widgets['button']
+        progress_bar = widgets['progress']
+        status_label = widgets['status']
+
+        # Hide button, show progress bar and status
+        btn.pack_forget()
+        progress_bar.pack(side="right", padx=5)
+        status_label.pack(side="right", padx=2)
+        progress_bar.set(0)
+        status_label.configure(text="Starting...")
+
+        def do_download():
+            try:
+                def progress_callback(progress, status):
+                    # Update progress bar and status on main thread
+                    def update_ui():
+                        progress_bar.set(progress / 100)
+                        # Shorten status text for display
+                        if "Downloading" in status:
+                            status_label.configure(text=f"{int(progress)}%")
+                        elif "Complete" in status or "done" in status.lower():
+                            status_label.configure(text="Done!", text_color="green")
+                        else:
+                            status_label.configure(text=status[:15])
+                    self.after(0, update_ui)
+
+                self.current_engine.download_voice(voice_id, progress_callback)
+
+                # Update UI on completion
+                def on_complete():
+                    progress_bar.set(1)
+                    status_label.configure(text="✓ Done", text_color="green")
+                    # Refresh voice dropdown
+                    self.update_voice_dropdown()
+
+                self.after(0, on_complete)
+
+            except Exception as e:
+                def on_error():
+                    progress_bar.pack_forget()
+                    status_label.configure(text="Failed", text_color="red")
+                    btn.pack(side="right", padx=5)
+                    btn.configure(text="Retry", state="normal")
+                self.after(0, on_error)
+
+        threading.Thread(target=do_download, daemon=True).start()
+
+    def show_manual_download_instructions(self, lang_code: str, lang_name: str):
+        """Show instructions for manually downloading voices"""
+        # Map language codes to HuggingFace folder names
+        lang_folder_map = {
+            'it': 'it/it_IT', 'fr': 'fr/fr_FR', 'es': 'es/es_ES', 'de': 'de/de_DE',
+            'pt': 'pt/pt_BR', 'ru': 'ru/ru_RU', 'zh': 'zh/zh_CN', 'ja': 'ja/ja_JP',
+            'ko': 'ko/ko_KR', 'nl': 'nl/nl_NL', 'pl': 'pl/pl_PL', 'uk': 'uk/uk_UA',
+            'vi': 'vi/vi_VN', 'ar': 'ar/ar_JO', 'tr': 'tr/tr_TR', 'hi': 'hi/hi_IN',
+            'cs': 'cs/cs_CZ', 'da': 'da/da_DK', 'fi': 'fi/fi_FI', 'el': 'el/el_GR',
+            'hu': 'hu/hu_HU', 'is': 'is/is_IS', 'nb': 'nb/nb_NO', 'ro': 'ro/ro_RO',
+            'sk': 'sk/sk_SK', 'sv': 'sv/sv_SE', 'sw': 'sw/sw_CD', 'ka': 'ka/ka_GE'
+        }
+
+        folder = lang_folder_map.get(lang_code, f"{lang_code}/{lang_code}_XX")
+        url = f"https://huggingface.co/rhasspy/piper-voices/tree/main/{folder}"
+
+        dialog = ctk.CTkToplevel(self)
+        dialog.title(f"Download {lang_name} Voices")
+        dialog.geometry("500x280")
+        dialog.transient(self)
+        dialog.grab_set()
+
+        # Center dialog
+        dialog.update_idletasks()
+        x = self.winfo_x() + (self.winfo_width() // 2) - 250
+        y = self.winfo_y() + (self.winfo_height() // 2) - 140
+        dialog.geometry(f"+{x}+{y}")
+
+        # Title
+        ctk.CTkLabel(
+            dialog,
+            text=f"Download {lang_name} Voices",
+            font=ctk.CTkFont(size=16, weight="bold")
+        ).pack(pady=(15, 10))
+
+        # Instructions
+        instructions = f"""No predefined {lang_name} voices found in the app.
+
+You can manually download {lang_name} voices from HuggingFace:
+
+1. Visit the link below
+2. Download both .onnx and .onnx.json files
+3. Place them in the models/piper/ folder
+4. Restart the app - voices will appear automatically!"""
+
+        ctk.CTkLabel(
+            dialog,
+            text=instructions,
+            font=ctk.CTkFont(size=11),
+            justify="left",
+            anchor="w"
+        ).pack(padx=20, pady=10, anchor="w")
+
+        # URL display
+        url_frame = ctk.CTkFrame(dialog, fg_color="transparent")
+        url_frame.pack(fill="x", padx=20, pady=5)
+
+        url_entry = ctk.CTkEntry(url_frame, width=350)
+        url_entry.insert(0, url)
+        url_entry.configure(state="readonly")
+        url_entry.pack(side="left", padx=5)
+
+        def copy_url():
+            self.clipboard_clear()
+            self.clipboard_append(url)
+            copy_btn.configure(text="Copied!")
+            self.after(2000, lambda: copy_btn.configure(text="Copy"))
+
+        copy_btn = ctk.CTkButton(
+            url_frame,
+            text="Copy",
+            width=60,
+            command=copy_url
+        )
+        copy_btn.pack(side="left", padx=5)
+
+        # Close button
+        ctk.CTkButton(
+            dialog,
+            text="Close",
+            width=100,
+            command=dialog.destroy
+        ).pack(pady=15)
 
     def on_closing(self):
         """Handle window close event"""

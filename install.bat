@@ -19,13 +19,17 @@ if errorlevel 1 (
 echo Python found!
 echo.
 
-:: Create virtual environment
-echo Creating virtual environment...
-python -m venv venv
-if errorlevel 1 (
-    echo ERROR: Failed to create virtual environment
-    pause
-    exit /b 1
+:: Create virtual environment (check if already exists)
+if exist "venv\" (
+    echo Virtual environment already exists.
+) else (
+    echo Creating virtual environment...
+    python -m venv venv
+    if errorlevel 1 (
+        echo ERROR: Failed to create virtual environment
+        pause
+        exit /b 1
+    )
 )
 
 echo.

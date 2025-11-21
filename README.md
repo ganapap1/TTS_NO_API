@@ -22,15 +22,16 @@ A powerful desktop application for converting text to speech using multiple TTS 
 ## Features
 
 ### Edge TTS (Online)
-- **40+ Neural Voices** - Microsoft's high-quality voices
-- **Multiple Accents** - US, UK, Australian, Indian, Canadian, Irish, and more
+- **400+ Neural Voices** - Microsoft's high-quality voices in 90+ languages
+- **Multi-Language Support** - Type/filter to find any language quickly
 - **Voice Controls** - Adjust speed (0.5x-2x), pitch (-50Hz to +50Hz), and volume (-50% to +50%)
 - **MP3 Output** - Standard audio format
 
 ### Piper TTS (Offline)
 - **No Internet Required** - Completely local processing
-- **High-Quality Voices** - Neural TTS technology
-- **Voice Download Manager** - Easy voice management
+- **Auto Language Detection** - Voices auto-filter based on your text
+- **Smart Voice Download** - Prompts to download voices when new language detected
+- **Voice Download Manager** - Easy voice management with "Check for New Voices"
 - **WAV Output** - Lossless audio format
 - **Fast Generation** - Optimized for CPU
 
@@ -40,6 +41,7 @@ A powerful desktop application for converting text to speech using multiple TTS 
 - Character and word count
 - Settings persistence (remembers your preferences)
 - Import text from files
+- **"Show All Languages"** - Toggle grouped view for all voices
 
 ---
 
@@ -102,38 +104,44 @@ python edge_tts_gui.py
 - **Edge** - Online (requires internet) - More voices, voice controls
 - **Piper** - Offline (local processing) - No internet needed
 
-### Step 2: Choose a Voice
-- Edge TTS: 40+ neural voices available immediately
-- Piper: Click "Download Voices" to get additional voices
+### Step 2: Enter Your Text
+- Type or import text in any language
+- The app auto-detects the language from your text
 
-### Step 3: Adjust Settings (Edge TTS only)
+### Step 3: Choose a Voice
+- **Edge TTS**: Type language name to filter (e.g., "French"), select language/voice
+- **Piper TTS**: Voices auto-filter by detected language. If no voices available, you'll be prompted to download
+
+### Step 4: Adjust Settings (Edge TTS only)
 - **Speed**: 0.5x to 2.0x
 - **Pitch**: -50Hz to +50Hz
 - **Volume**: -50% to +50%
 
-### Step 4: Generate Audio
-1. Enter or import your text
-2. Click "Generate MP3"
-3. Play the audio or open the folder
+### Step 5: Generate Audio
+1. Click "Generate MP3" (Edge) or "Generate WAV" (Piper)
+2. Play the audio or open the folder
+
+> **Tip**: Check "Show all languages" to see all voices grouped by language
 
 ---
 
 ## Available Voices
 
-### Edge TTS Voices (40+)
+### Edge TTS Voices (400+ in 90+ languages)
 
+Popular languages include: English, Spanish, French, German, Italian, Portuguese, Chinese, Japanese, Korean, Arabic, Hindi, and many more.
+
+**Sample English voices:**
 | Region | Voices |
 |--------|--------|
 | **English (US)** | Jenny, Guy, Aria, Davis, Amber, Ana, Andrew, Emma, Brian, Christopher, Eric, Michelle, Roger, Steffan |
 | **English (UK)** | Sonia, Ryan, Libby, Maisie, Thomas |
 | **English (Australia)** | Natasha, William |
 | **English (India)** | Neerja, Prabhat |
-| **English (Canada)** | Clara, Liam |
-| **English (Ireland)** | Emily, Connor |
-| **English (New Zealand)** | Molly, Mitchell |
-| **English (South Africa)** | Leah, Luke |
 
-### Piper TTS Voices
+> **Tip**: Type any language name in the language filter to quickly find voices!
+
+### Piper TTS Voices (55+ languages supported)
 
 **Bundled (installed automatically):**
 - **Amy** (US Female) - Clear, professional
@@ -141,7 +149,7 @@ python edge_tts_gui.py
 - **Lessac** (US Female) - Expressive
 - **Cori** (UK Female) - British accent
 
-**Additional voices available for download within the app.**
+**Additional voices**: Use "Download Voices" to add more languages. The app auto-prompts when you type in a new language!
 
 ---
 
@@ -172,6 +180,7 @@ TTS_NO_API/
 | `edge-tts` | >=7.0.0 | Microsoft Edge TTS |
 | `customtkinter` | >=5.2.0 | Modern GUI framework |
 | `piper-tts` | >=1.2.0 | Local neural TTS |
+| `langdetect` | >=1.0.9 | Auto language detection |
 
 ---
 
@@ -277,6 +286,14 @@ If you find this project useful:
 ---
 
 ## Changelog
+
+### Version 2.1.0
+- **Multi-Language Support** - Auto language detection from text (55+ languages)
+- **Smart Voice Filtering** - Voices auto-filter by detected language
+- **Language Download Prompt** - Auto-prompts to download voices for new languages
+- **Check for New Voices** - Button to find new voices for installed languages
+- **Show All Languages** - Toggle to view all voices grouped by language
+- **Enhanced Edge TTS** - 400+ voices in 90+ languages with easy filtering
 
 ### Version 2.0.0
 - Added Piper TTS engine for offline text-to-speech
