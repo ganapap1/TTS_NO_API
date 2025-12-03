@@ -193,10 +193,34 @@ TTS_NO_API/
 venv\Scripts\pip.exe install edge-tts
 ```
 
-#### "piper-tts not installed" error
+#### "piper-tts not installed" error or "Piper (Offline) is not available"
+
+**Solution 1: Manual Installation**
 ```bash
 venv\Scripts\pip.exe install piper-tts
 ```
+
+**Solution 2: Verify Installation**
+```bash
+venv\Scripts\python.exe -c "import piper"
+```
+If this fails, try:
+```bash
+venv\Scripts\pip.exe install piper-tts --no-cache-dir --force-reinstall
+```
+
+**Solution 3: Check Python Version**
+```bash
+python --version
+```
+Piper-tts requires Python 3.8 or higher.
+
+**Solution 4: Always Use run.bat**
+Don't run `python edge_tts_gui.py` directly. Always use:
+```
+run.bat
+```
+This ensures you're using the correct virtual environment.
 
 #### Application won't start
 1. Make sure Python 3.8+ is installed
