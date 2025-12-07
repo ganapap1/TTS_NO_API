@@ -260,13 +260,54 @@ This ensures you're using the correct virtual environment.
 
 ---
 
+## Commercial Use & Licensing
+
+### ⚠️ Important Legal Information
+
+This application is designed for **personal, educational, and development purposes only**.
+
+#### Edge TTS (Online)
+- **NOT for commercial use** - Edge TTS uses Microsoft's browser read-aloud service
+- Intended for personal use only, not an official Microsoft API
+- **For commercial/SaaS applications**: Use [Microsoft Azure AI Speech](https://azure.microsoft.com/en-us/services/cognitive-services/text-to-speech/) (official, licensed service)
+- Violating terms of service may result in service discontinuation
+
+#### Piper TTS (Offline)
+- **Software**: MIT License - ✅ Commercial use allowed
+- **Voice Models**: Each voice has its own license - ⚠️ Check before commercial use
+  - ✅ **CC BY 4.0 voices** - Generally OK for commercial use
+  - ❌ **Blizzard license voices** - NOT allowed for commercial use
+  - Check individual voice licenses at [HuggingFace Piper Voices](https://huggingface.co/rhasspy/piper-voices)
+- **Dependency Note**: Uses espeak-ng phonemizer (GPL license) - may have implications
+
+#### Recommended for Commercial Use
+- [Microsoft Azure AI Speech](https://azure.microsoft.com/en-us/services/cognitive-services/text-to-speech/) - Same voices as Edge TTS, officially licensed
+- [Google Cloud Text-to-Speech](https://cloud.google.com/text-to-speech)
+- [Amazon Polly](https://aws.amazon.com/polly/)
+- [ElevenLabs](https://elevenlabs.io/) - High-quality AI voices
+
+### ✅ Safe Use Cases
+- Personal projects
+- Educational purposes
+- Testing and development
+- Prototyping and demos
+- Non-commercial content creation
+
+### ❌ Avoid for Production
+- SaaS platforms
+- Commercial applications
+- Revenue-generating services
+- Client projects without proper licensing
+
+---
+
 ## Disclaimer
 
 This application uses:
 - **Microsoft Edge TTS** - A free service provided by Microsoft. This is not an official API and may change without notice.
 - **Piper TTS** - Open source local TTS (MIT License)
 
-For production or commercial use, consider official APIs like Google Cloud TTS or Amazon Polly.
+The authors are not responsible for any misuse or violations of third-party terms of service. Users must ensure compliance with all applicable licenses and terms.
 
 ---
 
