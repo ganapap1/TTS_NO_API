@@ -153,6 +153,38 @@ Popular languages include: English, Spanish, French, German, Italian, Portuguese
 
 ---
 
+## Indian Language Support in Piper (Offline Mode)
+
+Piper now supports Indian languages! The following voices are available for offline use:
+
+| Language | Voices |
+|----------|--------|
+| **Hindi** | Pratham (Male), Priyamvada (Female), Rohan (Male) |
+| **Telugu** | Maya (Female), Padmavathi (Female), Venkatesh (Male) |
+| **Malayalam** | Arjun (Male), Meera (Female) |
+
+> **Note:** Tamil, Gujarati, Bengali, Kannada, Marathi, Punjabi, and Urdu are not yet available in the Piper voices library. These languages are supported in **Edge (Online) mode**.
+
+### How to Use Indian Languages in Piper
+
+**Step 1** — Select **Piper** as the TTS engine and choose your language (e.g., Hindi). The app will prompt you to download voices if they are not yet installed.
+
+![Hindi language selected — prompt to download voices](docs/images/piper-indian-lang-select.png)
+
+**Step 2** — Click **Download Voices**. You will see all available voices for that language. Click **Download All** to install them in one go, or download individual voices as needed.
+
+![Download Hindi voices dialog showing all 3 available voices](docs/images/piper-download-voices.png)
+
+**Step 3** — Once the download is complete, all voices show a **Done** status. Close the dialog and start generating speech in your chosen language — fully offline!
+
+![Download complete — all Hindi voices ready to use](docs/images/piper-download-complete.png)
+
+**Step 4** — Type or paste your text in the Indian language, select the voice, and click **Generate**. The audio is processed entirely on your machine — no internet required!
+
+![Hindi text successfully converted to speech using Piper offline mode](docs/images/piper-hindi-tts-working.png)
+
+---
+
 ## Project Structure
 
 ```
@@ -351,6 +383,10 @@ If you find this project useful:
 ---
 
 ## Changelog
+
+### Version 2.2.0
+- **Indian Language Support in Piper** — Added Hindi (3 voices), Telugu (3 voices), and Malayalam (2 voices) for offline use
+- All new Indian language voices are downloadable on demand from within the app
 
 ### Version 2.1.0
 - **Multi-Language Support** - Auto language detection from text (55+ languages)
