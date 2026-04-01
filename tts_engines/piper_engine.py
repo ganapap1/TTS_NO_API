@@ -368,6 +368,60 @@ class PiperTTSEngine(BaseTTSEngine):
                 'bundled': False
             },
         },
+        'Hindi': {
+            'hi_IN-pratham-medium': {
+                'name': 'Pratham - Male, Hindi',
+                'url_base': 'https://huggingface.co/rhasspy/piper-voices/resolve/main/hi/hi_IN/pratham/medium',
+                'quality': 'medium',
+                'bundled': False
+            },
+            'hi_IN-priyamvada-medium': {
+                'name': 'Priyamvada - Female, Hindi',
+                'url_base': 'https://huggingface.co/rhasspy/piper-voices/resolve/main/hi/hi_IN/priyamvada/medium',
+                'quality': 'medium',
+                'bundled': False
+            },
+            'hi_IN-rohan-medium': {
+                'name': 'Rohan - Male, Hindi',
+                'url_base': 'https://huggingface.co/rhasspy/piper-voices/resolve/main/hi/hi_IN/rohan/medium',
+                'quality': 'medium',
+                'bundled': False
+            },
+        },
+        'Telugu': {
+            'te_IN-maya-medium': {
+                'name': 'Maya - Female, Telugu',
+                'url_base': 'https://huggingface.co/rhasspy/piper-voices/resolve/main/te/te_IN/maya/medium',
+                'quality': 'medium',
+                'bundled': False
+            },
+            'te_IN-padmavathi-medium': {
+                'name': 'Padmavathi - Female, Telugu',
+                'url_base': 'https://huggingface.co/rhasspy/piper-voices/resolve/main/te/te_IN/padmavathi/medium',
+                'quality': 'medium',
+                'bundled': False
+            },
+            'te_IN-venkatesh-medium': {
+                'name': 'Venkatesh - Male, Telugu',
+                'url_base': 'https://huggingface.co/rhasspy/piper-voices/resolve/main/te/te_IN/venkatesh/medium',
+                'quality': 'medium',
+                'bundled': False
+            },
+        },
+        'Malayalam': {
+            'ml_IN-arjun-medium': {
+                'name': 'Arjun - Male, Malayalam',
+                'url_base': 'https://huggingface.co/rhasspy/piper-voices/resolve/main/ml/ml_IN/arjun/medium',
+                'quality': 'medium',
+                'bundled': False
+            },
+            'ml_IN-meera-medium': {
+                'name': 'Meera - Female, Malayalam',
+                'url_base': 'https://huggingface.co/rhasspy/piper-voices/resolve/main/ml/ml_IN/meera/medium',
+                'quality': 'medium',
+                'bundled': False
+            },
+        },
     }
 
     def __init__(self):

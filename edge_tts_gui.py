@@ -92,11 +92,11 @@ class EdgeTTSApp(ctk.CTk):
         # Piper supported languages (~40 from HuggingFace)
         self.piper_languages = [
             "Arabic", "Catalan", "Chinese", "Czech", "Danish", "Dutch", "English (GB)",
-            "English (US)", "Finnish", "French", "German", "Greek", "Hungarian",
-            "Icelandic", "Italian", "Japanese", "Kazakh", "Korean", "Nepali",
+            "English (US)", "Finnish", "French", "German", "Greek", "Hindi", "Hungarian",
+            "Icelandic", "Italian", "Japanese", "Kazakh", "Korean", "Malayalam", "Nepali",
             "Norwegian", "Polish", "Portuguese (BR)", "Portuguese (PT)", "Romanian",
             "Russian", "Serbian", "Slovak", "Slovenian", "Spanish", "Swedish",
-            "Swahili", "Turkish", "Ukrainian", "Vietnamese", "Welsh"
+            "Swahili", "Telugu", "Turkish", "Ukrainian", "Vietnamese", "Welsh"
         ]
 
         # Edge TTS supported languages (100+)
